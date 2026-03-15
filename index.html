@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎊 ألعاب الجمعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="cft"></div>
+
+<!-- ==================== SETUP ==================== -->
+<div id="stp" class="scr on">
+  <div class="logo animate-in">
+    <em>🎊</em>
+    <h1>لعبة الألعاب</h1>
+    <p>سوّوا جمعة ما تُنسى</p>
+  </div>
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs animate-in">
+    <button class="mtab act" onclick="switchMode('solo')">👤 فردي</button>
+    <button class="mtab" onclick="switchMode('team')">👥 أفرقة</button>
+  </div>
+
+  <!-- SOLO SETUP -->
+  <div id="solo-setup" class="sbox animate-in">
+    <h2>👥 أضف اللاعبين</h2>
+    <div class="irow">
+      <input class="tinp" id="pinp" placeholder="اسم اللاعب..." onkeypress="if(event.key==='Enter')addP()">
+      <button class="btn bg" onclick="addP()">➕</button>
+    </div>
+    <div class="plist" id="plist"><div class="ehint">أضف على الأقل شخصين</div></div>
+  </div>
+
+  <!-- TEAM SETUP -->
+  <div class="team-setup-wrap" id="team-setup">
+    <div id="teams-list"></div>
+    <button class="add-team-btn" onclick="addTeam()">➕ أضف فريق</button>
+  </div>
+
+  <button class="sbtn" id="stbtn" onclick="startGame()" disabled>🚀 ابدأ الجمعة!</button>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<div id="main" class="scr">
+  <div class="topbar">
+    <button class="bkbtn" id="backbtn">← رجوع</button>
+    <div class="topbar-title" id="tbtitle">🎊 ألعاب الجمعة</div>
+  </div>
+
+  <!-- HOME -->
+  <div id="hp" class="pc">
+    <div class="sec-label">ألعاب فردية</div>
+    <div class="ggrid" id="solo-grid"></div>
+    <div class="sec-label">ألعاب أفرقة</div>
+    <div class="ggrid" id="team-grid"></div>
+  </div>
+
+  <!-- ===== SOLO GAME PAGES ===== -->
+
+  <!-- صراحة أو جراءة -->
+  <div id="tod-page" class="gpage pc">
+    <div class="animate-in">
+      <div id="tod-badge" class="pbadge">🎯 دور: <span id="tod-pn">-</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:24px">
+        <button class="btn bo" style="flex:1;color:#38BDF8;border-color:rgba(56,189,248,0.4)" onclick="drawTOD('t')">🤍 صراحة</button>
+        <button class="btn bo" style="flex:1;color:#EF4444;border-color:rgba(239,68,68,0.4)" onclick="drawTOD('d')">🔥 جراءة</button>
+      </div>
+      <div class="bigcard" id="tod-card"><div class="card-ph">اختر صراحة أو جراءة!</div></div>
+      <button class="btn bo bfull" onclick="nextTOD()">⏭ اللاعب التالي</button>
+    </div>
+  </div>
+
+  <!-- دولاب الحظ -->
+  <div id="wheel-page" class="gpage pc">
+    <div class="animate-in" style="display:flex;flex-direction:column;align-items:center;gap:16px">
+      <div style="display:flex;gap:8px;width:100%">
+        <input class="tinp" id="winp" placeholder="أضف اسم..." onkeypress="if(event.key==='Enter')addWN()" style="flex:1">
+        <button class="btn bg" onclick="addWN()">➕</button>
+      </div>
+      <div class="wchips" id="wchips"></div>
+      <div class="wcanvwrap">
+        <canvas id="wcanv" width="280" height="280"></canvas>
+        <div class="wptr">◀</div>
+        <button class="wspinbtn" onclick="spinW()">▶</button>
+      </div>
+      <div class="wresbox" id="wres"></div>
+    </div>
+  </div>
+
+  <!-- تطابق الأشكال -->
+  <div id="mem-page" class="gpage pc">
+    <div class="animate-in">
+      <div class="ibar">
+        <div class="ibitem"><div class="ibval" id="mm-moves">0</div><div class="iblbl">محاولات</div></div>
+        <div class="ibitem"><div class="ibval" id="mm-pairs">0/12</div><div class="iblbl">أزواج</div></div>
+        <div class="ibitem"><div class="ibval" id="mm-time">00:00</div><div class="iblbl">الوقت</div></div>
+      </div>
+      <div style="text-align:center;margin-bottom:14px" id="mem-turn"></div>
+      <div class="mgrid" id="mgrid"></div>
+      <div class="mscrow" id="mscrow"></div>
+      <button class="btn bo bfull" style="margin-top:14px" onclick="resetMem()">🔄 لعبة جديدة</button>
+    </div>
+  </div>
+
+  <!-- من أنا -->
+  <div id="whoami-page" class="gpage pc">
+    <div class="animate-in" style="text-align:center">
+      <div id="wa-badge" class="pbadge">🤔 المخمّن: <span id="wa-pn">-</span></div>
+      <div class="bigcard" id="wa-card">
+        <div style="font-size:50px" id="wa-ico">🎭</div>
+        <div class="card-lbl" id="wa-cat">اختر فئة</div>
+        <div class="card-txt" id="wa-word">اضغط "كلمة جديدة"</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:14px" id="wa-cats"></div>
+      <div class="hints-list" id="wa-hints"></div>
+      <div style="display:flex;gap:9px;margin-top:14px">
+        <button class="btn bg" style="flex:1" onclick="newWA()">🎲 كلمة جديدة</button>
+        <button class="btn bo" style="flex:1" onclick="addWAHint()">💡 تلميح</button>
+      </div>
+      <div style="display:flex;gap:9px;margin-top:9px">
+        <button class="btn bgreen" style="flex:1" onclick="waRight()">✅ خمّن صح (+1)</button>
+        <button class="btn bo" style="flex:1" onclick="nextWA()">⏭ التالي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- الكرسي الساخن -->
+  <div id="bomb-page" class="gpage pc">
+    <div class="animate-in" style="text-align:center">
+      <div id="bomb-badge" class="pbadge">💣 الكرسي: <span id="bomb-pn">-</span></div>
+      <div class="bombring-wrap">
+        <svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/><circle id="b-ring" cx="70" cy="70" r="60" fill="none" stroke="#22C55E" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="0" style="transition:stroke-dashoffset .1s linear,stroke .1s"/></svg>
+        <div class="bombring-center">
+          <div style="font-size:40px" id="b-emo">💣</div>
+          <div style="font-size:26px;font-weight:900" id="b-sec">15</div>
+        </div>
+      </div>
+      <div class="bigcard" id="bomb-card" style="min-height:140px"><div class="card-ph">اضغط "ابدأ السؤال"</div></div>
+      <!-- Answer area -->
+      <div id="bomb-ans-area" style="display:none;margin-bottom:12px"></div>
+      <div id="bomb-feedback" class="qfeedback"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:14px" id="bomb-cats"></div>
+      <div style="display:flex;gap:9px">
+        <button class="btn bg" style="flex:1" id="bomb-startbtn" onclick="startBomb()">💥 ابدأ السؤال</button>
+        <button class="btn bo" style="flex:1" onclick="nextBomb()">⏭ التالي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- كمّل القصة -->
+  <div id="story-page" class="gpage pc">
+    <div class="animate-in">
+      <div id="story-badge" class="pbadge">📖 دور: <span id="story-pn">-</span></div>
+      <div class="ibar" style="margin-bottom:10px">
+        <div class="ibitem"><div class="ibval" id="st-round">1</div><div class="iblbl">الجولة</div></div>
+        <div class="ibitem">
+          <div class="ibval" id="st-timer" style="color:var(--red)">20</div>
+          <div class="iblbl">ثانية</div>
+        </div>
+        <div class="ibitem"><div class="ibval" id="st-lines">0</div><div class="iblbl">جمل</div></div>
+      </div>
+      <div class="storybox" id="storybox"><div style="color:var(--sub);text-align:center;font-size:14px">اختر بداية للقصة</div></div>
+      <div class="starter-chips" id="st-starters"></div>
+      <div style="display:flex;gap:8px;margin-bottom:9px">
+        <input class="tinp" id="st-inp" placeholder="أكمل القصة..." onkeypress="if(event.key==='Enter')addStLine()" style="flex:1">
+        <button class="btn bg" onclick="addStLine()">➕</button>
+      </div>
+      <div style="display:flex;gap:9px">
+        <button class="btn bo" style="flex:1" onclick="newStory()">📖 قصة جديدة</button>
+        <button class="btn bo" style="flex:1" onclick="readStory()">🔊 اقرأ القصة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- تحديات الدقيقة -->
+  <div id="chal-page" class="gpage pc">
+    <div class="animate-in" style="text-align:center">
+      <div id="chal-badge" class="pbadge">⚡ دور: <span id="chal-pn">-</span></div>
+      <div class="chal-cats" id="chal-cats"></div>
+      <div class="bigcard" id="chal-card"><div class="card-ph">اختر فئة وسحب تحدي!</div></div>
+      <div style="display:flex;gap:9px">
+        <button class="btn bg" style="flex:1" onclick="drawChal()">🎲 سحب تحدي</button>
+        <button class="btn bo" style="flex:1" onclick="nextChal()">⏭ التالي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مسابقة المعلومات -->
+  <div id="quiz-page" class="gpage pc">
+    <div class="animate-in">
+      <div class="ibar">
+        <div class="ibitem"><div class="ibval" id="qz-num">1/20</div><div class="iblbl">السؤال</div></div>
+        <div class="ibitem"><div class="ibval" id="qz-sc">0</div><div class="iblbl">النقاط</div></div>
+        <div class="ibitem"><div class="ibval" id="qz-streak">0🔥</div><div class="iblbl">تسلسل</div></div>
+      </div>
+      <div id="qz-badge" class="pbadge">🧠 دور: <span id="qz-pn">-</span></div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:18px;padding:22px 20px;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:10px" id="qz-qnum">السؤال 1</div>
+        <div style="font-size:18px;font-weight:700;line-height:1.6;margin-bottom:20px" id="qz-qtxt"></div>
+        <div class="qopts" id="qz-opts"></div>
+      </div>
+      <div class="qfeedback" id="qz-fb"></div>
+      <button class="btn bg bfull" id="qz-next" style="display:none" onclick="nextQZ()">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- أسرع واحد -->
+  <div id="fast-page" class="gpage pc">
+    <div class="animate-in" style="text-align:center">
+      <div id="ff-badge" class="pbadge" style="margin-bottom:16px">⚡ أسرع واحد</div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:18px;padding:28px 20px;margin-bottom:20px">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:14px">أول واحد يكمّل التحدي يضغط اسمه!</div>
+        <div class="ff-question" id="ff-q" style="font-size:20px;font-weight:900;color:var(--gold);line-height:1.6;min-height:60px;display:flex;align-items:center;justify-content:center">اضغط "تحدي جديد" للبدء</div>
+      </div>
+      <div class="ff-players" id="ff-players" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px"></div>
+      <div style="background:var(--card2);border-radius:14px;padding:14px;display:none;margin-bottom:14px" id="ff-answer-reveal">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:6px">🏆 الفائز</div>
+        <div style="font-size:20px;font-weight:700;color:var(--gold)" id="ff-correct-ans"></div>
+      </div>
+      <button class="btn bg bfull" onclick="newFF()">⚡ تحدي جديد</button>
+    </div>
+  </div>
+
+  <!-- لعبة الأرقام -->
+  <div id="nums-page" class="gpage pc">
+    <div class="animate-in">
+      <div id="nums-badge" class="pbadge">🔢 دور: <span id="nums-pn">-</span></div>
+      <div style="text-align:center;margin-bottom:6px;color:var(--sub);font-size:13px">اضغط على رقم لتظهر تلميحاته — خمّن الرقم الصحيح!</div>
+      <div class="nums-grid" id="nums-grid"></div>
+      <div id="nums-current" style="background:var(--card2);border:1.5px solid var(--bor);border-radius:16px;padding:20px;margin-bottom:14px;display:none;text-align:center">
+        <div style="font-size:11px;color:var(--sub);letter-spacing:2px;margin-bottom:8px">التلميح</div>
+        <div style="font-size:18px;font-weight:700;line-height:1.6" id="nums-hint-txt"></div>
+      </div>
+      <div style="display:flex;gap:9px">
+        <button class="btn bg" style="flex:1" onclick="revealNum()">👁 كشف الإجابة</button>
+        <button class="btn bo" style="flex:1" onclick="nextNums()">⏭ التالي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مين قالها -->
+  <div id="wsi-page" class="gpage pc">
+    <div class="animate-in" style="text-align:center">
+      <div class="bigcard" id="wsi-card"><div class="card-ph">اضغط "جملة جديدة"</div></div>
+      <div class="wsi-choices" id="wsi-choices" style="margin-bottom:14px"></div>
+      <div class="qfeedback" id="wsi-fb"></div>
+      <button class="btn bg bfull" onclick="newWSI()">🎲 جملة جديدة</button>
+    </div>
+  </div>
+
+  <!-- لعبة الملاحظة -->
+  <div id="obs-page" class="gpage pc">
+    <div class="animate-in">
+      <div id="obs-badge" class="pbadge">👁 دور: <span id="obs-pn">-</span></div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:18px;padding:22px;margin-bottom:14px;text-align:center">
+        <div style="font-size:11px;color:var(--sub);letter-spacing:2px;margin-bottom:10px" id="obs-status">شاهد الأشياء — ستختفي بعد 10 ثواني!</div>
+        <div style="font-size:48px;margin-bottom:6px;letter-spacing:6px" id="obs-scene"></div>
+        <div style="font-size:13px;color:var(--sub)" id="obs-countdown"></div>
+      </div>
+      <div id="obs-answer-area" style="display:none;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:8px;text-align:center">كم عنصر تذكر؟ اضغط كل واحد شفته ✓</div>
+        <div class="obs-items" id="obs-items"></div>
+        <div style="text-align:center;margin-top:12px">
+          <div style="font-size:14px;color:var(--sub)">نقاطك: <span id="obs-score-live" style="color:var(--gold);font-weight:900;font-size:20px">0</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:9px;margin-top:12px">
+        <button class="btn bg" style="flex:1" onclick="startObs()">👁 جولة جديدة</button>
+        <button class="btn bo" style="flex:1" onclick="nextObs()">⏭ التالي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TEAM GAME PAGES ===== -->
+
+  <!-- تحدي الصور -->
+  <div id="photo-page" class="gpage pc">
+    <div class="animate-in">
+      <div class="team-score-bar" id="photo-tsbar"></div>
+      <div id="photo-tbadge" class="tteam-badge">📸 دور فريق: <span id="photo-tn">-</span></div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:18px;padding:20px;margin-bottom:14px;text-align:center">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:6px" id="photo-cat-label">الفئة: —</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:12px">الفريق الثاني يخمن مين/وين هذا؟</div>
+        <div style="position:relative;display:inline-block;width:100%">
+          <img id="photo-img" style="width:100%;max-height:280px;object-fit:cover;border-radius:14px;display:block;filter:blur(22px);transition:filter .6s" src="" alt="">
+          <div id="photo-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px">⏳</div>
+        </div>
+        <div style="margin-top:10px;font-size:13px;font-weight:700;color:var(--sub)" id="photo-hint-label"></div>
+      </div>
+      <div class="qfeedback" id="photo-fb"></div>
+      <div style="display:flex;gap:9px;margin-bottom:9px">
+        <button class="btn bg" style="flex:1" onclick="revealPhoto()">👁 اكشف الصورة</button>
+        <button class="btn bgreen" style="flex:1" onclick="photoRight()">✅ خمّنوا صح (+2)</button>
+      </div>
+      <div style="display:flex;gap:9px">
+        <button class="btn bo" style="flex:1" onclick="newPhoto()">🎲 صورة جديدة</button>
+        <button class="btn bo" style="flex:1" onclick="nextPhotoTeam()">⏭ دور الفريق التاني</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- تحدي المعلومات -->
+  <div id="tinfo-page" class="gpage pc">
+    <div class="animate-in">
+      <div class="team-score-bar" id="tinfo-tsbar"></div>
+      <div class="team-turn-indicator" id="tinfo-tti"></div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:18px;padding:22px 20px;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:10px" id="tinfo-qnum">السؤال 1</div>
+        <div style="font-size:18px;font-weight:700;line-height:1.6;margin-bottom:18px" id="tinfo-qtxt"></div>
+        <div class="qopts" id="tinfo-opts"></div>
+      </div>
+      <div class="qfeedback" id="tinfo-fb"></div>
+      <button class="btn bg bfull" id="tinfo-next" style="display:none" onclick="nextTInfo()">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- وين هذا -->
+  <div id="where-page" class="gpage pc">
+    <div class="animate-in">
+      <div class="team-score-bar" id="where-tsbar"></div>
+      <div id="where-tbadge" class="tteam-badge">🗺️ دور فريق: <span id="where-tn">-</span></div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:18px;padding:20px;margin-bottom:14px;text-align:center">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:10px">في أي مكان هذا؟</div>
+        <div style="font-size:64px;margin-bottom:8px" id="where-img"></div>
+        <div style="font-size:15px;font-weight:700;color:var(--sub)" id="where-clue"></div>
+      </div>
+      <div class="qopts" id="where-opts"></div>
+      <div class="qfeedback" id="where-fb"></div>
+      <button class="btn bg bfull" id="where-next" style="display:none" onclick="nextWhere()">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- لعبة أمثال -->
+  <div id="rebus-page" class="gpage pc">
+    <div class="animate-in">
+      <div class="team-score-bar" id="rebus-tsbar"></div>
+      <div id="rebus-tbadge" class="tteam-badge">📜 دور فريق: <span id="rebus-tn">-</span></div>
+      <div style="background:var(--card2);border:1.5px solid var(--bor);border-radius:20px;padding:28px 24px;margin-bottom:14px;text-align:center">
+        <div style="font-size:11px;color:var(--sub);letter-spacing:2px;margin-bottom:16px">إيش معنى هذا المثل؟</div>
+        <div id="rebus-display" style="font-size:22px;font-weight:900;line-height:1.7;color:var(--gold);min-height:60px;display:flex;align-items:center;justify-content:center">—</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:10px" id="rebus-difficulty"></div>
+      </div>
+      <div class="qopts" id="rebus-opts" style="margin-bottom:12px"></div>
+      <div class="qfeedback" id="rebus-fb"></div>
+      <div style="display:flex;gap:9px">
+        <button class="btn bg" style="flex:1" onclick="newRebus()">🎲 مثل جديد</button>
+        <button class="btn bo" style="flex:1" onclick="nextRebusTeam()">⏭ دور الفريق التاني</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SCORE PANEL -->
+<div class="spanel" id="spanel" onclick="if(event.target===this)closeSP()">
+  <div class="sdrawer">
+    <div class="shandle"></div>
+    <div class="shdr"><h2>🏆 الترتيب</h2><button class="scls" onclick="closeSP()">✕</button></div>
+    <div id="best-box-wrap"></div>
+    <div id="slist"></div>
+  </div>
+</div>
+
+<button class="fbtn" id="fbtn" style="display:none" onclick="openSP()">🏆 النقاط</button>
+
+<!-- OVERLAY -->
+<div class="ovl" id="ovl">
+  <div class="obox">
+    <span class="oico" id="o-ico">🎉</span>
+    <div class="otitle" id="o-title">رائع!</div>
+    <div class="osub" id="o-sub"></div>
+    <button class="btn bg" onclick="closeOvl()" style="width:100%">👏 حلو!</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+
+
+<div style="text-align:center;padding:18px;color:rgba(255,255,255,0.18);font-size:12px;font-family:'Tajawal',sans-serif;position:relative;z-index:1">
+  جميع الحقوق محفوظة لي أنا
+</div>
+</body>
+</html>
